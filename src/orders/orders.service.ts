@@ -9,22 +9,22 @@ import { Repository } from 'typeorm';
 export class OrdersService {
   constructor(
     @InjectRepository(OrderEntity)
-    private readonly ordersRepository: Repository<OrderEntity>,
+    private readonly repository: Repository<OrderEntity>,
   ) {}
   async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
-    const order = this.ordersRepository.create(createOrderDto);
-    return this.ordersRepository.save(order);
+    const order = this.repository.create(createOrderDto);
+    return this.repository.save(order);
   }
 
   async findOne(id: number): Promise<OrderEntity> {
-    return this.ordersRepository.findOneBy({ id });
+    return this.repository.findOneBy({ id });
   }
 
   async update(
     id: number,
     updateOrderDto: UpdateOrderDto,
   ): Promise<OrderEntity> {
-    await this.ordersRepository.update(id, updateOrderDto);
+    await this.repository.update(id, updateOrderDto);
     return this.findOne(id);
   }
 }

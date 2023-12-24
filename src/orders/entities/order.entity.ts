@@ -1,10 +1,5 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { AbstractEntity } from 'src/abstracts/abstract_entity';
+import { Entity, Column } from 'typeorm';
 
 export enum OrderStatus {
   Pending = 'Pending',
@@ -13,16 +8,7 @@ export enum OrderStatus {
 }
 
 @Entity()
-export class OrderEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-
+export class OrderEntity extends AbstractEntity {
   @Column({ array: true })
   pizzaIds: number;
 
