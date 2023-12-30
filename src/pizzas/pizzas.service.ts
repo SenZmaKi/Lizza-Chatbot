@@ -2,21 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { CreatePizzaDto } from './dto/create-pizza.dto';
 import { UpdatePizzaDto } from './dto/update-pizza.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PizzaEntity } from './entities/pizza.entity';
+import { Pizza } from './entities/pizza.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class PizzasService {
   constructor(
-    @InjectRepository(PizzaEntity)
-    private readonly repository: Repository<PizzaEntity>,
+    @InjectRepository(Pizza)
+    private readonly repository: Repository<Pizza>,
   ) {}
-  async create(createPizzaDto: CreatePizzaDto): Promise<PizzaEntity> {
-    const pizza = this.repository.create(createPizzaDto);
-    return this.repository.save(pizza);
+  async create(createPizzaDto: CreatePizzaDto): Promise<Pizza> {
+    return this.repository.save(createPizzaDto);
   }
 
-  async findAll(): Promise<PizzaEntity[]> {
+  async findAll(): Promise<Pizza[]> {
     return this.repository.find();
   }
 
@@ -27,14 +26,9 @@ export class PizzasService {
   async update(
     id: number,
     updatePizzaDto: UpdatePizzaDto,
-  ): Promise<PizzaEntity> {
+  ): Promise<Pizza> {
     await this.repository.update(id, updatePizzaDto);
     return this.find(id);
   }
 
-  async remove(id: number): Promise<PizzaEntity> {
-    const removed = await this.find(id);
-    this.repository.remove(removed);
-    return removed;
-  }
 }

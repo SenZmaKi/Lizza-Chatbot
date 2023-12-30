@@ -1,30 +1,70 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderEntity } from './entities/order.entity';
+import { Order, OrderStatus } from './entities/order.entity';
 import { Repository } from 'typeorm';
+import { PizzasService } from 'src/pizzas/pizzas.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(OrderEntity)
-    private readonly repository: Repository<OrderEntity>,
+    @InjectRepository(Order)
+    private readonly repository: Repository<Order>,
+    @Inject(PizzasService)
+    private readonly pizzasService: PizzasService,
   ) {}
-  async create(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
-    const order = this.repository.create(createOrderDto);
+  async create(
+    user: User,
+    createOrderDto: CreateOrderDto,
+  ): Promise<Order> {
+    const pizzasPromise = createOrderDto.pizzaIds.map((pizzaId) =>
+      this.pizzasService.find(pizzaId),
+    );
+    const pizzas = await Promise.all(pizzasPromise);
+    const order = Order.create(user, pizzas);
     return this.repository.save(order);
   }
 
-  async findOne(id: number): Promise<OrderEntity> {
+  async find(id: number): Promise<Order> {
     return this.repository.findOneBy({ id });
   }
 
-  async update(
+  async findAllForUser(id: number): Promise<Order[]> {
+    return this.repository.find({ where: { user: { id: id } } });
+  }
+
+  async findAll(): Promise<Order[]> {
+    return this.repository.find();
+  }
+  async cancelOrder(
     id: number,
-    updateOrderDto: UpdateOrderDto,
-  ): Promise<OrderEntity> {
-    await this.repository.update(id, updateOrderDto);
-    return this.findOne(id);
+    userId: number,
+  ): Promise<Order> {
+    return this.updateStatus(id, userId, { status: OrderStatus.Cancelled });
+  }
+  async completeOrder(
+    id: number,
+    userId: number,
+  ): Promise<Order> {
+    return this.updateStatus(id, userId, { status: OrderStatus.Completed });
+  }
+
+  async updateStatus(
+    id: number,
+    userId: number,
+    updateOrderStatusDto: UpdateOrderStatusDto,
+  ): Promise<Order> {
+    const order = await this.find(id);
+    console.log(order)
+    if (order.user.id !== userId) {
+      throw new ForbiddenException(
+        'Invalid User ID',
+        'This order does not belong to the user with the provided id',
+      );
+    }
+    await this.repository.update(id, updateOrderStatusDto);
+    return this.find(id);
   }
 }

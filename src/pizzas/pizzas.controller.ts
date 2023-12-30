@@ -26,7 +26,7 @@ export class PizzasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  find(@Param('id') id: string) {
     return this.pizzasService.find(+id);
   }
 
@@ -35,8 +35,4 @@ export class PizzasController {
     return this.pizzasService.update(+id, updatePizzaDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pizzasService.remove(+id);
-  }
 }
