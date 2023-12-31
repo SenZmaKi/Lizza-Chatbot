@@ -7,7 +7,10 @@ import { DATABASE_PATH, DEBUG } from './constants';
 import { PizzasModule } from './pizzas/pizzas.module';
 import { UsersModule } from './users/users.module';
 import { debugSetup } from './constants';
+import { ChatsModule } from './chats/chats.module';
+import { configDotenv } from 'dotenv';
 debugSetup();
+configDotenv();
 
 @Module({
   imports: [
@@ -20,6 +23,7 @@ debugSetup();
     OrdersModule,
     PizzasModule,
     UsersModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

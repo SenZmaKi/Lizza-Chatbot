@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 export const DEBUG = true;
 export const ROOT_DIR = './';
-const DATABASE_FOLDER = ROOT_DIR + 'database/';
-export const DATABASE_PATH = DATABASE_FOLDER + 'db.sqlite';
-const DB_IS_POPULATED_FILE_PATH = DATABASE_FOLDER + 'db-is-populated';
+const DATABASE_FOLDER_PATH = ROOT_DIR + 'database/';
+const IMAGES_FOLDER_PATH = DATABASE_FOLDER_PATH + 'images/';
+export const PIZZA_IMAGES_FOLDER_PATH = IMAGES_FOLDER_PATH + 'pizza-images/';
+export const DATABASE_PATH = DATABASE_FOLDER_PATH + 'db.sqlite';
 
 function deleteSafely(path: string) {
   try {
@@ -11,16 +12,11 @@ function deleteSafely(path: string) {
   } catch (error) {}
 }
 
-//  To repopulate the db delete the file at DB_IS_POPULATED_FILE_PATH
-export function populateDatabase(): boolean {
-  if (DEBUG) {
-    try {
-      fs.statSync(DB_IS_POPULATED_FILE_PATH);
-      return false;
-    } catch (error) {
-      fs.writeFileSync(DB_IS_POPULATED_FILE_PATH, 'Hello Lizza!');
-      return true;
-    }
+export function databaseFileExists(): boolean {
+  try {
+    return fs.statSync(DATABASE_FOLDER_PATH).isFile();
+  } catch (error) {
+    return false;
   }
 }
 

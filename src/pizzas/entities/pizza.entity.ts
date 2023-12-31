@@ -1,10 +1,12 @@
+import * as path from 'path';
 import { AbstractEntity } from 'src/abstracts/abstract_entity';
+import { PIZZA_IMAGES_FOLDER_PATH } from 'src/constants';
 import { Order } from 'src/orders/entities/order.entity';
 import { Column, Entity, ManyToMany } from 'typeorm';
 
 @Entity()
 export class Pizza extends AbstractEntity {
-  @Column()id
+  @Column()
   name: string;
 
   @Column()
@@ -16,9 +18,12 @@ export class Pizza extends AbstractEntity {
   @Column()
   quantity: number;
 
-  @ManyToMany(() => Order, (order) => order.pizzas )
+  @ManyToMany(() => Order, (order) => order.pizzas)
   orders: Order[];
 
+  static joinFromPizzaImagesFolder(imageName: string): string {
+    return PIZZA_IMAGES_FOLDER_PATH + imageName;
+  }
 
   static create(
     name: string,
@@ -28,7 +33,7 @@ export class Pizza extends AbstractEntity {
   ): Pizza {
     const pizza = new Pizza();
     pizza.name = name;
-    pizza.imageUrl = imageUrl;
+    pizza.imageUrl = path.resolve(imageUrl);
     pizza.price = price;
     pizza.quantity = quantity;
     return pizza;

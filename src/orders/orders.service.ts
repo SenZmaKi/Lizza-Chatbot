@@ -57,7 +57,6 @@ export class OrdersService {
     updateOrderStatusDto: UpdateOrderStatusDto,
   ): Promise<Order> {
     const order = await this.find(id);
-    console.log(order)
     if (order.user.id !== userId) {
       throw new ForbiddenException(
         'Invalid User ID',

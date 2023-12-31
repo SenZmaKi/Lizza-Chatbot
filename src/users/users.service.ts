@@ -9,7 +9,7 @@ import { PizzasService } from 'src/pizzas/pizzas.service';
 import { Pizza } from 'src/pizzas/entities/pizza.entity';
 import { CreateOrderDto } from 'src/orders/dto/create-order.dto';
 import { Order } from 'src/orders/entities/order.entity';
-import { populateDatabase } from 'src/constants';
+import { DEBUG, databaseFileExists } from 'src/constants';
 
 @Injectable()
 export class UsersService {
@@ -21,8 +21,8 @@ export class UsersService {
     @InjectRepository(User)
     private readonly repository: Repository<User>,
   ) {
-    if (populateDatabase()) {
-      this.populate();
+    if (DEBUG && !databaseFileExists()) {
+      this.populateDatabase();
     }
   }
 
@@ -73,31 +73,31 @@ export class UsersService {
     const pizzaData = [
       {
         name: 'Margherita',
-        imageUrl: 'margherita.jpg',
+        imageUrl: Pizza.joinFromPizzaImagesFolder('margherita.jpg'),
         price: 10.99,
         quantity: 100,
       },
       {
         name: 'Pepperoni',
-        imageUrl: 'pepperoni.jpg',
+        imageUrl: Pizza.joinFromPizzaImagesFolder('pepperoni.jpg'),
         price: 12.99,
         quantity: 80,
       },
       {
         name: 'Vegetarian',
-        imageUrl: 'vegetarian.jpg',
+        imageUrl: Pizza.joinFromPizzaImagesFolder('vegetarian.jpg'),
         price: 11.49,
         quantity: 90,
       },
       {
         name: 'Hawaiian',
-        imageUrl: 'hawaiian.jpg',
+        imageUrl: Pizza.joinFromPizzaImagesFolder('hawaiian.jpg'),
         price: 13.99,
         quantity: 75,
       },
       {
         name: 'BBQ Chicken',
-        imageUrl: 'bbq_chicken.jpg',
+        imageUrl: Pizza.joinFromPizzaImagesFolder('bbq-chicken.jpg'),
         price: 14.99,
         quantity: 85,
       },
@@ -133,12 +133,13 @@ export class UsersService {
     await Promise.all(
       ordersData.map(async (orderData) => {
         const { user, pizzaIds } = orderData;
-        await this.ordersService.create(user, { pizzaIds });
+        const order = await this.ordersService.create(user, { pizzaIds });
+        await this.ordersService.completeOrder(order.id, user.id);
       }),
     );
   }
 
-  async populate(): Promise<void> {
+  async populateDatabase(): Promise<void> {
     await this.populateUsers();
     await this.populatePizzas();
     await this.populateOrders();
