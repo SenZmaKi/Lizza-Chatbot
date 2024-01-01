@@ -5,6 +5,7 @@ const DATABASE_FOLDER_PATH = ROOT_DIR + 'database/';
 const IMAGES_FOLDER_PATH = DATABASE_FOLDER_PATH + 'images/';
 export const PIZZA_IMAGES_FOLDER_PATH = IMAGES_FOLDER_PATH + 'pizza-images/';
 export const DATABASE_PATH = DATABASE_FOLDER_PATH + 'db.sqlite';
+export const REFRESH_DATABASE = DEBUG && true;
 
 function deleteSafely(path: string) {
   try {
@@ -21,7 +22,6 @@ export function databaseFileExists(): boolean {
 }
 
 export function debugSetup() {
-  if (DEBUG) {
-    deleteSafely(DATABASE_PATH);
-  }
-}
+  if (REFRESH_DATABASE) {
+  deleteSafely(DATABASE_PATH);
+}}

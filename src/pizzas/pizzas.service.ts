@@ -14,7 +14,7 @@ export class PizzasService {
   async create(createPizzaDto: CreatePizzaDto): Promise<Pizza> {
     const pizza = Pizza.create(
       createPizzaDto.name,
-      createPizzaDto.imageUrl,
+      createPizzaDto.imageName,
       createPizzaDto.price,
       createPizzaDto.quantity,
     );
@@ -30,10 +30,21 @@ export class PizzasService {
   }
 
   findByName(name: string): Promise<Pizza> {
-    return this.repository.findOneBy({ name });
+    // a case insensitive sql query
+    return this.repository
+      .createQueryBuilder('pizza')
+      .select()
+      .where('LOWER(pizza.name) = LOWER(:name)', { name })
+      .getOne();
   }
 
   async update(id: number, updatePizzaDto: UpdatePizzaDto): Promise<Pizza> {
+    if (updatePizzaDto.imageName) {
+      updatePizzaDto.imageUrl = Pizza.joinFromPizzaImagesFolder(
+        updatePizzaDto.imageName,
+      );
+      delete updatePizzaDto.imageName;
+    }
     await this.repository.update(id, updatePizzaDto);
     return this.find(id);
   }

@@ -6,10 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DATABASE_PATH, DEBUG } from './constants';
 import { PizzasModule } from './pizzas/pizzas.module';
 import { UsersModule } from './users/users.module';
-import { debugSetup } from './constants';
+import { debugSetup as setupDebug } from './constants';
 import { ChatsModule } from './chats/chats.module';
 import { configDotenv } from 'dotenv';
-debugSetup();
+if (DEBUG) {
+  setupDebug();
+}
 configDotenv();
 
 @Module({
@@ -28,4 +30,7 @@ configDotenv();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+  }
+}

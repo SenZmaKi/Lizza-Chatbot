@@ -1,4 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
+// users.service.ts
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserAddressDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +10,7 @@ import { PizzasService } from 'src/pizzas/pizzas.service';
 import { Pizza } from 'src/pizzas/entities/pizza.entity';
 import { CreateOrderDto } from 'src/orders/dto/create-order.dto';
 import { Order } from 'src/orders/entities/order.entity';
-import { DEBUG, databaseFileExists } from 'src/constants';
+import { REFRESH_DATABASE, databaseFileExists } from 'src/constants';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +22,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly repository: Repository<User>,
   ) {
-    if (DEBUG && !databaseFileExists()) {
+    if (REFRESH_DATABASE && !databaseFileExists()) {
       this.populateDatabase();
     }
   }
@@ -30,8 +31,7 @@ export class UsersService {
     return this.repository.save(createUserDto);
   }
   async find(id: number): Promise<User> {
-    const user = await this.repository.findOneBy({ id });
-    return user;
+    return this.repository.findOneBy({ id });
   }
 
   async findAll(): Promise<User[]> {
@@ -52,6 +52,9 @@ export class UsersService {
 
   async makeOrder(id: number, createOrderDto: CreateOrderDto): Promise<Order> {
     const user = await this.find(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
     const order = await this.ordersService.create(user, createOrderDto);
     return order;
   }
@@ -67,37 +70,37 @@ export class UsersService {
   async getRecommendedPizza(id: number): Promise<Pizza> {
     const pizzas = await this.pizzasService.findAll();
     const randomIdx = Math.floor(Math.random() * pizzas.length);
-    return pizzas[randomIdx];
+    return pizzas ? pizzas[randomIdx] : null;
   }
   async populatePizzas(): Promise<void> {
     const pizzaData = [
       {
         name: 'Margherita',
-        imageUrl: Pizza.joinFromPizzaImagesFolder('margherita.jpg'),
+        imageName: 'margherita.jpg',
         price: 10.99,
         quantity: 100,
       },
       {
         name: 'Pepperoni',
-        imageUrl: Pizza.joinFromPizzaImagesFolder('pepperoni.jpg'),
+        imageName: 'pepperoni.jpg',
         price: 12.99,
         quantity: 80,
       },
       {
         name: 'Vegetarian',
-        imageUrl: Pizza.joinFromPizzaImagesFolder('vegetarian.jpg'),
+        imageName: 'vegetarian.jpg',
         price: 11.49,
         quantity: 90,
       },
       {
         name: 'Hawaiian',
-        imageUrl: Pizza.joinFromPizzaImagesFolder('hawaiian.jpg'),
+        imageName: 'hawaiian.jpg',
         price: 13.99,
         quantity: 75,
       },
       {
         name: 'BBQ Chicken',
-        imageUrl: Pizza.joinFromPizzaImagesFolder('bbq-chicken.jpg'),
+        imageName: 'bbq-chicken.jpg',
         price: 14.99,
         quantity: 85,
       },
@@ -130,13 +133,12 @@ export class UsersService {
       { user: users[1], pizzaIds: [4, 1] },
     ];
 
-    await Promise.all(
-      ordersData.map(async (orderData) => {
-        const { user, pizzaIds } = orderData;
-        const order = await this.ordersService.create(user, { pizzaIds });
-        await this.ordersService.completeOrder(order.id, user.id);
-      }),
-    );
+    for (let orderData of ordersData) {
+      const order = await this.ordersService.create(orderData.user, {
+        pizzaIds: orderData.pizzaIds,
+      });
+      await this.ordersService.completeOrder(order.id, order.user.id);
+    }
   }
 
   async populateDatabase(): Promise<void> {
