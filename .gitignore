@@ -1,5 +1,9 @@
+# local env
+.env-local
+
 # database
 /database/db.sqlite
+/database/.open
 
 # compiled output
 /dist

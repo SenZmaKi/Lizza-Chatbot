@@ -40,7 +40,7 @@ export class PizzasService {
 
   async update(id: number, updatePizzaDto: UpdatePizzaDto): Promise<Pizza> {
     if (updatePizzaDto.imageName) {
-      updatePizzaDto.imageUrl = Pizza.joinFromPizzaImagesFolder(
+      updatePizzaDto.imageUrl = Pizza.joinFromPizzaImages(
         updatePizzaDto.imageName,
       );
       delete updatePizzaDto.imageName;

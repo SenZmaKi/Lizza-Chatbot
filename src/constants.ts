@@ -2,10 +2,10 @@ import * as fs from 'fs';
 export const DEBUG = true;
 export const ROOT_DIR = './';
 const DATABASE_FOLDER_PATH = ROOT_DIR + 'database/';
-const IMAGES_FOLDER_PATH = DATABASE_FOLDER_PATH + 'images/';
-export const PIZZA_IMAGES_FOLDER_PATH = IMAGES_FOLDER_PATH + 'pizza-images/';
 export const DATABASE_PATH = DATABASE_FOLDER_PATH + 'db.sqlite';
+export const LOCAL_ENV_FILE_PATH = ROOT_DIR + '.env-local'
 export const REFRESH_DATABASE = DEBUG && true;
+export const GITHUB_RAW_ENTRYPOINT = "https://raw.githubusercontent.com/SenZmaKi/Lizza-Chatbot/master/"
 
 function deleteSafely(path: string) {
   try {

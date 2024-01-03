@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OrdersModule } from './orders/orders.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DATABASE_PATH, DEBUG } from './constants';
+import { DATABASE_PATH, DEBUG, LOCAL_ENV_FILE_PATH } from './constants';
 import { PizzasModule } from './pizzas/pizzas.module';
 import { UsersModule } from './users/users.module';
 import { debugSetup as setupDebug } from './constants';
@@ -13,6 +13,7 @@ if (DEBUG) {
   setupDebug();
 }
 configDotenv();
+configDotenv({path: LOCAL_ENV_FILE_PATH})
 
 @Module({
   imports: [
