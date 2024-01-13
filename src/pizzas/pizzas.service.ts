@@ -17,6 +17,7 @@ export class PizzasService {
       createPizzaDto.imageName,
       createPizzaDto.price,
       createPizzaDto.quantity,
+      createPizzaDto.description
     );
     return this.repository.save(pizza);
   }

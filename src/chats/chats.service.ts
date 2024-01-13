@@ -71,7 +71,6 @@ export class ChatsService {
   }
 
   async makeOrder(userId: number, pizzaName: string): Promise<MessageResponse> {
-    console.log('pizzaName', pizzaName);
     const pizza = await this.pizzasService.findByName(pizzaName);
     const pizzaIds = [pizza.id];
     const order = await this.usersService.makeOrder(userId, { pizzaIds });
