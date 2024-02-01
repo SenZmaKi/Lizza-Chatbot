@@ -1,5 +1,4 @@
 // pizza.entity.ts
-import * as path from 'path';
 import { AbstractEntity } from 'src/abstracts/abstract_entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Column, Entity, ManyToMany } from 'typeorm';
